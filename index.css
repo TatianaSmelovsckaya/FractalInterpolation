@@ -1,0 +1,145 @@
+﻿html
+{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font: 16px 'PT Sans', sans-serif;
+    color: #000;
+}
+
+body
+{
+    margin: 0;
+    padding: 0;
+}
+
+#regionCursorInOriginalImage,
+#domainCursorInOriginalImage,
+#regionCursorInCompressedImage
+{
+    /* display: none; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 3px;
+    border: 1px solid #0f0;
+}
+
+#domainCursorInOriginalImage
+{
+    width: 7px;
+    height: 7px;
+    border-color: #f00;
+}
+
+#performanceType
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 256px;
+    height: 1.5rem;
+    background-color: rgba(0,0,0,.05);
+    text-align: center;
+    font-size: .75rem;
+    line-height: 1.5rem;
+    /* display: none; */
+}
+
+main
+{
+    display: flex;
+    flex-direction: column;
+    width: 800px;
+    margin: 1rem auto;
+    padding: 0;
+}
+
+.creatingPoint,
+.interpolation
+{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+    padding: 2rem;
+    background: #f5f5f5;
+}
+
+.creatingPoint__header,
+.interpolation__header
+{
+    width: 100%;
+    margin: 0 0 2rem;
+    padding: 0;
+    font-size: 1.25rem;
+    text-align: center
+}
+
+.imageArea
+{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 256px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 2rem;
+    background: #fff;
+}
+
+#originalImage,
+#processedImage
+{
+    margin-right: 0;
+}
+
+#compressedImage,
+#interpolatedImage
+{
+    margin-left: 6rem;
+}
+
+.imageArea__header
+{
+    margin: 0;
+    padding: 0;
+    font-style: italic;
+    font-size: 1rem;
+    font-weight: normal;
+    color: #888;
+}
+
+.imageArea__canvas
+{
+    width: 256px;
+    height: 256px; 
+    margin: 1.5rem 0 0;
+    padding: 0;
+    background: #f5f5f5;
+}
+
+.imageArea__button
+{
+    margin-top: 1.5rem;
+    cursor: pointer;
+}
+
+.imageArea__link
+{
+    margin: 1rem 0 0;
+    padding: 0;
+    font-style: italic;
+    font-size: .75rem;
+    color: #080;
+    cursor: pointer;
+}
+
+.imageArea__link:hover
+{
+    color: #0a0;
+}
+
+#compressedImage__downloadDatafile
+{
+    display: none;
+}
