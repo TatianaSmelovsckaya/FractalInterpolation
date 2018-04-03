@@ -6,66 +6,51 @@
     <link href="index.css" rel="stylesheet">
 </head>
 <body>
-    <div id="regionCursorInOriginalImage"></div>
-    <div id="domainCursorInOriginalImage"></div>
-    <div id="regionCursorInCompressedImage"></div>
-    <div id="performanceType"></div>
-
     <main>
         <section class="creatingPoint">
             <h1 class="creatingPoint__header">Создание неподвижной точки</h1>
 
             <div class="imageArea" id="originalImage">
-                <h2 class="imageArea__header">Исходное изображение</h2>
-                <canvas class="imageArea__canvas" id="originalImage__canvas" width="256" height="256">
-                </canvas>
-                <input class="imageArea__button" id="originalImage__upload" type="file" 
-                name="originalImage" accept="images/jpg,image/bmp,image/png" 
-                onchange="uploadImage(this.name,this.value)">
+                <canvas class="imageArea__canvas" id="originalImage__canvas" width="256" height="256"></canvas>
+                <input class="imageArea__button" type="file" accept="images/jpg,image/bmp,image/png" 
+                name="originalImage" onchange="uploadImage(this.name,this.value)">
+
+                <div id="originalImage__regionCursor"></div>
+                <div id="originalImage__domainCursor"></div>
+                <div id="originalImage__performanceType"></div>
             </div>
 
             <div class="imageArea" id="compressedImage">
-                <h2 class="imageArea__header">Сжатое изображение</h2>
-                <canvas class="imageArea__canvas" id="compressedImage__canvas" width="256" height="256">
-                </canvas>
-                <button class="imageArea__button" id="compressedImage__start" 
-                onclick="startCompressionImage()">
-                    Начать сжатие
-                </button>
-                <a class="imageArea__link" id="compressedImage__downloadDatafile">
-                    Скачать данные JSON
-                </a>
+                <canvas class="imageArea__canvas" id="compressedImage__canvas" width="256" height="256"></canvas>
+                <button class="imageArea__button" onclick="startCompression()">Начать сжатие</button>
+                <a class="imageArea__link" id="compressedImage__downloadData">Скачать данные JSON</a>
+
+                <div id="compressedImage__regionCursor"></div>
             </div>
         </section>
 
-        <section class="interpolation">
-            <h1 class="interpolation__header">
-                Фрактальная интерполяция изображения
-            </h1>
+		<section class="interpolation">
+            <h1 class="interpolation__header">Фрактальная интерполяция</h1>
+
             <div class="imageArea" id="processedImage">
-                <img class="imageArea__source" id="processedImage__source"  
-                alt="Обрабатываемое изображение" title="Обрабатываемое изображение">
-                <canvas class="imageArea__canvas" id="processedImage__canvas" width="256" height="256">
-                </canvas>
-                <input class="imageArea__button" id="processedImage__upload" type="file" 
-                name="processedImage" accept="images/jpg,image/bmp,image/png" 
-                onchange="uploadImage(this.name,this.value)">
+                <canvas class="imageArea__canvas" id="processedImage__canvas" width="256" height="256"></canvas>
+                <input class="imageArea__button" type="file" accept="images/jpg,image/bmp,image/png" 
+                name="processedImage" onchange="uploadImage(this.name,this.value)">
             </div>
+
             <div class="imageArea" id="interpolatedImage">
-                <img class="imageArea__source" id="interpolatedImage__source" 
-                alt="Интерполированное изображение" title="Интерполированное изображение">
-                <canvas class="imageArea__canvas" id="interpolatedImage__canvas" width="256" height="256">
-                </canvas>
-                <button class="imageArea__button" id="interpolatedImage__start" 
-                onclick="startInterpolationImage()">
-                    Начать интерполяцию
-                </button>
+                <canvas class="imageArea__canvas" id="interpolatedImage__canvas1" width="256" height="256"></canvas>
+                <canvas class="imageArea__canvas" id="interpolatedImage__canvas2" width="256" height="256"></canvas>
+                <button class="imageArea__button" onclick="startInterpolation()">Начать интерполяцию</button>
             </div>
         </section>
     </main>
-    <script src="getDomains.js" type="text/javascript"></script>
+
+    <script src="index.js" type="text/javascript"></script>
+    <script src="getAllDomains.js" type="text/javascript"></script>
     <script src="findSimilarDomains.js" type="text/javascript"></script>
     <script src="drawCompressedImage.js" type="text/javascript"></script>
-    <script src="index.js" type="text/javascript"></script>
+    <script src="activateLinkOnFile.js" type="text/javascript"></script>
+    <script src="onMouseDownHandler.js" type="text/javascript"></script>
 </body>
 </html>

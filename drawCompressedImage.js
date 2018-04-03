@@ -1,22 +1,25 @@
 ﻿"use strict";
 
+// OK
+// Огругление значения пикселя при корректировке
+function floorPixelChannel(pixelChannel) {
+    return (pixelChannel < 0) ? 0 : ((pixelChannel > 255) ? 255 : Math.floor(pixelChannel));
+}
 
-const PIXEL_OPACITY = 255;
-
-
+// OK
 // Отрисовка сжатого изображения на холст
 function drawCompressedImage(data, similarDomains) {
     console.log();
     console.log("Отрисовка сжатого изображения - Старт");
 
-    let startTime = new Date();
-
     let compressedCanvas = document.getElementById("compressedImage__canvas");
     let compressedContext = compressedCanvas.getContext('2d');
     let compressedImageData = compressedContext.createImageData(IMAGE_SIZE, IMAGE_SIZE);
     let compressedData = compressedImageData.data;
+
+    let startTime = new Date();
     
-    for (let regionIndex = 0; regionIndex < REGIONS_IN_LINE ** 2; regionIndex++) {
+    for (let regionIndex = 0; regionIndex < REGIONS_IN_IMAGE; regionIndex++) {
         let regionOffsetX = regionIndex % REGIONS_IN_LINE;
         let regionOffsetY = Math.floor(regionIndex / REGIONS_IN_LINE);
 
@@ -25,30 +28,26 @@ function drawCompressedImage(data, similarDomains) {
 
         let domainObject = similarDomains[regionIndex];
 
-        let domainOffsetInPixelsX = domainObject.offsetX;
-        let domainOffsetInPixelsY = domainObject.offsetY;
+        let domainOffsetX = domainObject.offsetX;
+        let domainOffsetY = domainObject.offsetY;
         let performanceType = domainObject.performanceType;
 
-        let domain = formMatrix(data, domainOffsetInPixelsX, domainOffsetInPixelsY);
+        let domain = formMatrix(data, domainOffsetX, domainOffsetY);
         let region = performDomain(domain, performanceType);
 
-        let alpha = domainObject.alpha;
-        let beta = domainObject.beta;
+        let alphas = domainObject.alphas;
+        let betas = domainObject.betas;
 
         for (let i = 0; i < REGION_SIZE; i++) {
             for (let j = 0; j < REGION_SIZE; j++) {
                 let index = 4 * (regionOffsetInPixelsX + regionOffsetInPixelsY + i * IMAGE_SIZE + j);
 
-                let regionR = alpha * region[i][j][0] + beta;
-                compressedData[index] = floorPixelChannel(regionR);
+                for (let channel = 0; channel < CHANNEL_COUNT; channel++) {
+                    let regionChannel = alphas[channel] * region[i][j][channel] + betas[channel];
+                    compressedData[index + channel] = floorPixelChannel(regionChannel);
+                }
 
-                let regionG = alpha * region[i][j][1] + beta;
-                compressedData[index+1] = floorPixelChannel(regionG);
-
-                let regionB = alpha * region[i][j][2] + beta;
-                compressedData[index+2] = floorPixelChannel(regionB);
-
-                compressedData[index+3] = PIXEL_OPACITY;
+                compressedData[index+3] = OPACITY_CHANNEL;
             }
         }
     }
