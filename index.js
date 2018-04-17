@@ -1,19 +1,19 @@
 "use strict";
 
 
-const IMAGE_SIZE = 256;
-const REGION_SIZE = 4;
-const DOMAIN_SIZE = 8;
+let IMAGE_SIZE = 256;
+let REGION_SIZE = 4;
+let DOMAIN_SIZE = 2 * REGION_SIZE;
 
-const REGIONS_IN_LINE = IMAGE_SIZE / REGION_SIZE;
-const REGIONS_IN_IMAGE = REGIONS_IN_LINE ** 2;
+let REGIONS_IN_LINE = IMAGE_SIZE / REGION_SIZE;
+let REGIONS_IN_IMAGE = REGIONS_IN_LINE ** 2;
 
-const PIXELS_IN_REGION = REGION_SIZE ** 2;
-const PIXELS_IN_DOMAIN = DOMAIN_SIZE ** 2;
+let PIXELS_IN_REGION = REGION_SIZE ** 2;
+let PIXELS_IN_DOMAIN = DOMAIN_SIZE ** 2;
 
-const OPACITY_CHANNEL = 255;
+let OPACITY_CHANNEL = 255;
 
-const performanceTypes = [
+let performanceTypes = [
     "Без изменений",
     "Поворот на 90",
     "Поворот на 180",
@@ -24,7 +24,9 @@ const performanceTypes = [
     "Поворот на 180 + Отражение"
 ];
 
+let METRIC_NUMBER = 0;
 
+let FILE_NAME = "";
 
 //
 // СОЗДАНИЕ НЕПОДВИЖНОЙ ТОЧКИ
@@ -53,9 +55,13 @@ function makeGrayImage(context) {
 // OK
 // Загрузка изображения на холст
 // 'C:\fakepath\filename' -> filename , 'C:\fakepath\'.length = 12
-function uploadImage(namespace, filename) {
+function uploadImage(namespace, pathToFile) {
+    let filename = pathToFile.substr(12);
+    let partsOfFilename = filename.split('.');
+    FILE_NAME = partsOfFilename[0] + partsOfFilename[1];
+
     let uploadedImage = document.createElement('img');
-    uploadedImage.src = 'img/' + filename.substr(12);
+    uploadedImage.src = 'img/' + filename;
 
     uploadedImage.onload = function() {
         let canvas = document.getElementById(namespace + "__canvas");
@@ -67,12 +73,36 @@ function uploadImage(namespace, filename) {
 }
 
 // OK
-// Обработчик клика по кнопке "Начать сжатие"
+// Обработчик клика по кнопке "Сформировать"
 function startCompression() {
     let originalCanvas = document.getElementById("originalImage__canvas");
     let originalContext = originalCanvas.getContext('2d');
     let originalImageData = originalContext.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE);
     let originalData = originalImageData.data;
+
+    let regionSizeCollection = document.getElementsByName('regionSize');
+    for (let i = 0; i < regionSizeCollection.length; i++) {
+        if (regionSizeCollection[i].checked) {
+            REGION_SIZE = parseInt(regionSizeCollection[i].value);
+            DOMAIN_SIZE = 2 * REGION_SIZE;
+
+            REGIONS_IN_LINE = IMAGE_SIZE / REGION_SIZE;
+            REGIONS_IN_IMAGE = REGIONS_IN_LINE ** 2;
+
+            PIXELS_IN_REGION = REGION_SIZE ** 2;
+            PIXELS_IN_DOMAIN = DOMAIN_SIZE ** 2;
+        }
+    }
+    console.log(REGION_SIZE);
+    console.log(DOMAIN_SIZE);
+
+    let metricCollection = document.getElementsByName('metric');
+    for (let i = 0; i < metricCollection.length; i++) {
+        if (metricCollection[i].checked) {
+            METRIC_NUMBER = parseInt(metricCollection[i].value);
+        }
+    }
+    console.log(METRIC_NUMBER);
 
     // Получение из изображения всевозможных доменов (см. getAllDomains.js)
     let allDomains = getAllDomains(originalData);
@@ -86,11 +116,9 @@ function startCompression() {
     // Активация ссылки на скачивание файла с коэффициентами интерполяции (см. activateLinkOnFile.js)
     activateLinkOnFile(changedRegions);
 
-    // Подсветка обработанного региона (см. onMouseDownHandler.js)
-    let compressedCanvas = document.getElementById("compressedImage__canvas");
-    compressedCanvas.addEventListener('mousedown', onMouseDownHandler);
+    // Подсветка обработанного региона (см. showCursors.js)
+    showCursors();
 }
-
 
 
 //
@@ -98,29 +126,33 @@ function startCompression() {
 //
 
 
-const INTERPOLATION_ITERATIONS = 25;
+const INTERPOLATION_ITERATIONS = 100;
 
+let dataForInterpolation;
 
-function startInterpolation() {
-    
-    function readTextFile(file, callback) {
-        var rawFile = new XMLHttpRequest();
-        rawFile.overrideMimeType("application/json");
-        rawFile.open("GET", file, true);
-        rawFile.onreadystatechange = function() {
-            if (rawFile.readyState === 4 && rawFile.status == "200") {
-                callback(rawFile.responseText);
-            }
+// ОК
+// Загрузка данных в формате JSON
+function uploadDataJSON(pathToFile) {
+    let filename = pathToFile.substr(12);
+
+    let rawFile = new XMLHttpRequest();
+
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", filename, true);
+
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            dataForInterpolation = JSON.parse(rawFile.responseText);
+            console.log(dataForInterpolation[1023]);
         }
-        rawFile.send(null);
     }
 
-    let cr;
-    readTextFile("1jpg_ssim_4_8.json", function(text){
-        cr = JSON.parse(text);
-        console.log(cr[1023]);
-    });
-    
+    rawFile.send(null);
+}
+
+// ОК
+// Обработчик клика по кнопке "Начать интерполяцию"
+function startInterpolation() {
     console.log("");
     console.log("Интерполяция - Старт");
 
@@ -166,32 +198,29 @@ function startInterpolation() {
             }
 
             for (let regionIndex = 0; regionIndex < REGIONS_IN_IMAGE; regionIndex++) {
-                let regionX = REGION_SIZE * (regionIndex % REGIONS_IN_LINE);
-                let regionY = IMAGE_SIZE * REGION_SIZE * parseInt(regionIndex / REGIONS_IN_LINE);
+                let regionOffsetX = regionIndex % REGIONS_IN_LINE;
+                let regionOffsetY = Math.floor(regionIndex / REGIONS_IN_LINE);
 
-                let regionInfo = cr[regionIndex];
+                let regionOffsetInPixelsX = regionOffsetX * REGION_SIZE;
+                let regionOffsetInPixelsY = regionOffsetY * REGION_SIZE * IMAGE_SIZE;
 
-                let alphas = regionInfo.alphas;
-                let alphaR = alphas[0];
-                let alphaG = alphas[1];
-                let alphaB = alphas[2];
+                let regionObject = dataForInterpolation[regionIndex];
 
-                let betas = regionInfo.betas;
-                let betaR = betas[0];
-                let betaG = betas[1];
-                let betaB = betas[2];
+                let alphas = regionObject.alphas;
+                let betas = regionObject.betas;
 
-                let domain = formMatrix(firstData, regionInfo.offsetX, regionInfo.offsetY);
-                    let performedDomain = performDomain(domain, regionInfo.performanceType);
+                let domain = formMatrix(firstData, regionObject.offsetX, regionObject.offsetY);
+                    let performedDomain = performDomain(domain, regionObject.performanceType);
 
                 for (let i = 0; i < REGION_SIZE; i++) {
                     for (let j = 0; j < REGION_SIZE; j++) {
-                        let index = 4 * (regionX + regionY + i*IMAGE_SIZE + j);
+                        let index = 4 * (regionOffsetInPixelsX + regionOffsetInPixelsY + i * IMAGE_SIZE + j);
 
-                        secondData[index]   = alphaR * performedDomain[i][j][0] + betaR;
-                        secondData[index+1] = alphaG * performedDomain[i][j][1] + betaG;
-                        secondData[index+2] = alphaB * performedDomain[i][j][2] + betaB;
-                        secondData[index+3] = firstData[index+3];
+                        for (let channel = 0; channel < CHANNEL_COUNT; channel++) {
+                            secondData[index + channel] = alphas[channel] * performedDomain[i][j][channel] + betas[channel];
+                        }
+
+                        secondData[index+3] = OPACITY_CHANNEL;
                     }
                 }
             }

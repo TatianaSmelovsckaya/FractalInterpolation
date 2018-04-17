@@ -7,42 +7,121 @@
 </head>
 <body>
     <main>
-        <section class="creatingPoint">
-            <h1 class="creatingPoint__header">Создание неподвижной точки</h1>
+        <section class="step" id="creatingPoint">
+            <h1 class="step__header">Формирование неподвижной точки</h1>
 
-            <div class="imageArea" id="originalImage">
-                <canvas class="imageArea__canvas" id="originalImage__canvas" width="256" height="256"></canvas>
-                <input class="imageArea__button" type="file" accept="images/jpg,image/bmp,image/png" 
-                name="originalImage" onchange="uploadImage(this.name,this.value)">
+            <article class="displayImages">
+                <div class="imageArea" id="originalImage">
+                    <canvas class="imageArea__canvas" id="originalImage__canvas" width="256" height="256"></canvas>
+                    <span class="imageArea__header">Исходное изображение</span>
 
-                <div id="originalImage__regionCursor"></div>
-                <div id="originalImage__domainCursor"></div>
-                <div id="originalImage__performanceType"></div>
-            </div>
+                    <div id="originalImage__regionCursor"></div>
+                    <div id="originalImage__domainCursor"></div>
+                </div>
 
-            <div class="imageArea" id="compressedImage">
-                <canvas class="imageArea__canvas" id="compressedImage__canvas" width="256" height="256"></canvas>
-                <button class="imageArea__button" onclick="startCompression()">Начать сжатие</button>
-                <a class="imageArea__link" id="compressedImage__downloadData">Скачать данные JSON</a>
+                <div class="imageArea" id="compressedImage">
+                    <canvas class="imageArea__canvas" id="compressedImage__canvas" width="256" height="256"></canvas>
+                    <span class="imageArea__header">Сжатое изображение</span>
 
-                <div id="compressedImage__regionCursor"></div>
-            </div>
+                    <div id="compressedImage__regionCursor"></div>
+                </div>
+
+                <div class="performance">
+                    <span id="performance__type">Преобразование:</span>
+                    <span id="performance__alphaR">AlphaR:</span>
+                    <span id="performance__betaR">BetaR:</span>
+                    <span id="performance__alphaG">AlphaG:</span>
+                    <span id="performance__betaG">BetaG:</span>
+                    <span id="performance__alphaB">AlphaB:</span>
+                    <span id="performance__betaB">BetaB:</span>
+                </div>
+            </article>
+
+            <article class="selectors">
+                <div class="selector" id="selectorOfImage">
+                    <span class="selector__header">
+                        <strong>Шаг 1.</strong> Загрузите изображение
+                    </span>
+
+                    <input type="file" accept="images/jpg,image/bmp,image/png" 
+                    name="originalImage" onchange="uploadImage(this.name,this.value)">
+                </div>
+
+                <div class="selector" id="selectorOfRegionSize">
+                    <span class="selector__header">
+                        <strong>Шаг 2.</strong> Выберите размер региона
+                    </span>
+
+                    <div class="regionSizes">
+                        <input type="radio" name="regionSize" id="regionSize__4" value="4" checked>
+                        <input type="radio" name="regionSize" id="regionSize__8" value="8" >
+                        <input type="radio" name="regionSize" id="regionSize__16" value="16" >
+                        <input type="radio" name="regionSize" id="regionSize__32" value="32" >
+
+                        <label class="regionSize" for="regionSize__4">4</label>
+                        <label class="regionSize" for="regionSize__8">8</label>
+                        <label class="regionSize" for="regionSize__16">16</label>
+                        <label class="regionSize" for="regionSize__32">32</label>
+                    </div>
+                </div>
+
+                <div class="selector" id="selectorOfMetric">
+                    <span class="selector__header">
+                        <strong>Шаг 3.</strong> Выберите метрику для сравнения регионов
+                    </span>
+
+                    <div class="metrics">
+                        <input type="radio" name="metric" id="metric__1" value="1" checked>
+                        <input type="radio" name="metric" id="metric__2" value="2" disabled>
+                        <input type="radio" name="metric" id="metric__3" value="3" >
+
+                        <label class="metric" for="metric__1">Евклидова метрика</label>
+                        <label class="metric" for="metric__2">Корреляционная метрика</label>
+                        <label class="metric" for="metric__3">Метрика SSIM</label>
+                    </div>
+                </div>
+
+                <button class="selectors__button" onclick="startCompression()">Сформировать</button>
+                <a id="selectors__downloadData">Скачать данные JSON</a>
+            </article>
         </section>
 
-		<section class="interpolation">
-            <h1 class="interpolation__header">Фрактальная интерполяция</h1>
+		<section class="step" id="interpolation">
+            <h1 class="step__header">Фрактальная интерполяция</h1>
 
-            <div class="imageArea" id="processedImage">
-                <canvas class="imageArea__canvas" id="processedImage__canvas" width="256" height="256"></canvas>
-                <input class="imageArea__button" type="file" accept="images/jpg,image/bmp,image/png" 
-                name="processedImage" onchange="uploadImage(this.name,this.value)">
-            </div>
+            <article class="displayImages">
+                <div class="imageArea" id="originalImage">
+                    <canvas class="imageArea__canvas" id="processedImage__canvas" width="256" height="256"></canvas>
+                    <span class="imageArea__header">Исходное изображение</span>
+                </div>
 
-            <div class="imageArea" id="interpolatedImage">
-                <canvas class="imageArea__canvas" id="interpolatedImage__canvas1" width="256" height="256"></canvas>
-                <canvas class="imageArea__canvas" id="interpolatedImage__canvas2" width="256" height="256"></canvas>
-                <button class="imageArea__button" onclick="startInterpolation()">Начать интерполяцию</button>
-            </div>
+                <div class="imageArea" id="compressedImage">
+                    <canvas class="imageArea__canvas" id="interpolatedImage__canvas1" width="256" height="256"></canvas>
+                    <canvas class="imageArea__canvas" id="interpolatedImage__canvas2" width="256" height="256"></canvas>
+                    <span class="imageArea__header">Интерполированное изображение</span>
+                </div>
+            </article>
+
+            <article class="selectors">
+                <div class="selector" id="selectorOfImage">
+                    <span class="selector__header">
+                        <strong>Шаг 1.</strong> Загрузите изображение
+                    </span>
+
+                    <input type="file" accept="images/jpg,image/bmp,image/png" 
+                    name="processedImage" onchange="uploadImage(this.name,this.value)">
+                </div>
+
+                <div class="selector" id="selectorOfDataJSON">
+                    <span class="selector__header">
+                        <strong>Шаг 2.</strong> Загрузите данные для интерполяци в формате JSON
+                    </span>
+
+                    <input type="file" accept="text/json" onchange="uploadDataJSON(this.value)">
+                </div>
+
+                <button class="selectors__button" onclick="startInterpolation()">Начать интерполяцию</button>
+            </article>
         </section>
     </main>
 
@@ -51,6 +130,6 @@
     <script src="findSimilarDomains.js" type="text/javascript"></script>
     <script src="drawCompressedImage.js" type="text/javascript"></script>
     <script src="activateLinkOnFile.js" type="text/javascript"></script>
-    <script src="onMouseDownHandler.js" type="text/javascript"></script>
+    <script src="showCursors.js" type="text/javascript"></script>
 </body>
 </html>
